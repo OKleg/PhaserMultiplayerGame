@@ -1,0 +1,17 @@
+{
+  "name": "tom",
+  "version": "1.0.0",
+  "description": "Phaser game tom",
+  "main": "game.js",
+  "scripts": {
+    "test": "test",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2",
+    "phaser": "^3.80.1",
+    "socket.io": "^4.7.5"
+  }
+}
