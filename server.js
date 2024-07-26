@@ -4,7 +4,7 @@ var server = require("http").Server(app);
 const io = require("socket.io")(server);
 //const io = require("socket.io").listen(server);
 var players = {};
-
+var bombData = {};
 var tomatoItem = {
   x: 50 + Math.floor(Math.random() * 550),
   y: 150 + Math.floor(Math.random() * 150),
@@ -46,6 +46,12 @@ io.on("connection", function (socket) {
     // отправляем сообщение всем игрокам, чтобы удалить этого игрока
 
     socket.broadcast.emit("disconnect_player", socket.id);
+  });
+  socket.on("addBomb", function () {
+    bombData.x = 40 + Math.floor(Math.random() * 560);
+    bombData.dir = Math.random() % 2 ? 100 : -100;
+    socket.emit("addedBomb", bombData);
+    socket.broadcast.emit("addedBomb", bombData);
   });
   // когда игроки движутся, то обновляем данные по ним
   socket.on("playerMovement", function (movementData) {

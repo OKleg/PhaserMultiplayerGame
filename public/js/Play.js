@@ -80,22 +80,15 @@ class Play extends Phaser.Scene {
       scene: this,
     });
     this.itemsGroup.addTomatoItem(200, 200);
-    this.blueScoreText = this.add
-      .bitmapText(0, 40, "pixelFont", Phaser.Utils.String.Pad("0", 6, "0", 1))
-      .setTint(0x0000ff);
-    this.redScoreText = this.add
-      .bitmapText(
-        this.scale.width,
-        40,
-        "pixelFont",
-        Phaser.Utils.String.Pad("0", 6, "0", 1)
-      )
-      .setOrigin(1, 0)
-      .setTint(0xff0000);
+    this.socket.on("addedBomb", function (bombData) {
+      self.bombsGroup.addBomb(bombData.x, bombData.dir);
+    });
 
     this.socket.on("scoreUpdate", function (scores) {
-      self.blueScoreText.setText(scores.blue);
-      self.redScoreText.setText(scores.red);
+      self.registry.events.emit("update_points", {
+        blue: scores.blue,
+        red: scores.red,
+      });
     });
     this.socket.on("starLocation", function (starLocation) {
       if (self.itemsGroup)
@@ -159,10 +152,9 @@ function addPlayer(self, playerInfo) {
 
   self.physics.add.overlap(self.itemsGroup, self.tomato, () => {
     self.sound.play("pop");
-    //self.registry.events.emit("update_points");
     self.socket.emit("starCollected");
     self.itemsGroup.destroyItem();
-    //self.bombsGroup.addBomb();
+    self.socket.emit("addBomb");
   });
 }
 function addOtherPlayers(self, playerInfo) {
@@ -184,10 +176,9 @@ function addOtherPlayers(self, playerInfo) {
 
   self.physics.add.overlap(self.itemsGroup, otherPlayer, () => {
     self.sound.play("pop");
-    //self.registry.events.emit("update_other_points");
     self.socket.emit("starCollected");
     self.itemsGroup.destroyItem();
-    //self.bombsGroup.addBomb();
+    self.socket.emit("addBomb");
   });
 
   otherPlayer.playerId = playerInfo.playerId;
